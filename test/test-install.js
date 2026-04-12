@@ -78,7 +78,7 @@ describe('install', function () {
         await fn.call(this)
         const expectedDir = path.join(prog.devDir, process.version.replace(/^v/, ''))
         await rm(expectedDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 1000 })
-        await Promise.all(new Array(5).fill(0).map(async (_, i) => {
+        await Promise.all(new Array(50).fill(0).map(async (_, i) => {
           const title = `${' '.repeat(8)}${name} ${(i + 1).toString().padEnd(2, ' ')}`
           console.log(`${title} : Start`)
           console.time(title)
