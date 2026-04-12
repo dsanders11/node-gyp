@@ -169,7 +169,8 @@ describe('addon', function () {
       const [npmErr] = await util.execFile('npm', ['install', '--ignore-scripts'], { cwd: addonPath, shell: process.platform === 'win32' })
       assert.strictEqual(npmErr, null)
 
-      const copies = await Promise.all(new Array(process.platform === 'linux' ? 100 : 10).fill(0).map(async (_, i) => {
+      const testCount = process.platform === 'linux' ? 100 : process.platform === 'darwin' ? 50 : 10
+      const copies = await Promise.all(new Array(testCount).fill(0).map(async (_, i) => {
         const copyDir = path.join(addonCopiesDir, `hello_world_${i}`)
         await fs.promises.cp(addonPath, copyDir, { recursive: true })
         return copyDir
