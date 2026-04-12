@@ -166,7 +166,7 @@ describe('addon', function () {
 
     runIt('parallel rebuild', async function () {
       // Install dependencies (nan) so copies in temp directories can resolve them
-      const [npmErr] = await util.execFile('npm', ['install', '--ignore-scripts'], { cwd: addonPath })
+      const [npmErr] = await util.execFile('npm', ['install', '--ignore-scripts'], { cwd: addonPath, shell: process.platform === 'win32' })
       assert.strictEqual(npmErr, null)
 
       const copies = await Promise.all(new Array(50).fill(0).map(async (_, i) => {
