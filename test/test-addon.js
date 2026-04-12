@@ -161,7 +161,11 @@ describe('addon', function () {
     }
 
     runIt('parallel rebuild', async function () {
-      const copies = await Promise.all(new Array(35).fill(0).map(async (_, i) => {
+      // Install dependencies (nan) so copies in temp directories can resolve them
+      const [npmErr] = await util.execFile('npm', ['install', '--ignore-scripts'], { cwd: addonPath })
+      assert.strictEqual(npmErr, null)
+
+      const copies = await Promise.all(new Array(50).fill(0).map(async (_, i) => {
         const copyDir = path.join(addonCopiesDir, `hello_world_${i}`)
         await fs.promises.cp(addonPath, copyDir, { recursive: true })
         return copyDir
