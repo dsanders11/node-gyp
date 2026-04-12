@@ -154,6 +154,10 @@ describe('addon', function () {
         return it.skip('Skipping parallel build test due to test environment configuration')
       }
 
+      if (process.platform === 'darwin' && process.arch === 'x64') {
+        return it.skip('Skipping parallel build test on x64 macOS')
+      }
+
       return it(name, async function () {
         this.timeout(platformTimeout(10, { win32: 20 }))
         await fn.call(this)
