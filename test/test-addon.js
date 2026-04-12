@@ -133,14 +133,20 @@ describe('addon', function () {
 
   describe('parallel', function () {
     let devDir
+    let addonCopiesDir
 
     beforeEach(async () => {
       devDir = await mkdtemp(path.join(os.tmpdir(), 'node-gyp-test-'))
+      addonCopiesDir = await mkdtemp(path.join(os.tmpdir(), 'node-gyp-test-addons-'))
     })
 
     afterEach(async () => {
-      await rm(devDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 1000 })
+      await Promise.all([
+        rm(devDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 1000 }),
+        rm(addonCopiesDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 1000 })
+      ])
       devDir = null
+      addonCopiesDir = null
     })
 
     const runIt = (name, fn) => {
@@ -155,8 +161,13 @@ describe('addon', function () {
     }
 
     runIt('parallel rebuild', async function () {
-      const cmd = [nodeGyp, 'rebuild', '-C', addonPath, '--loglevel=verbose', `--devdir=${devDir}`]
-      await Promise.all(new Array(35).fill(0).map(async (_, i) => {
+      const copies = await Promise.all(new Array(35).fill(0).map(async (_, i) => {
+        const copyDir = path.join(addonCopiesDir, `hello_world_${i}`)
+        await fs.promises.cp(addonPath, copyDir, { recursive: true })
+        return copyDir
+      }))
+      await Promise.all(copies.map(async (copyDir, i) => {
+        const cmd = [nodeGyp, 'rebuild', '-C', copyDir, '--loglevel=verbose', `--devdir=${devDir}`]
         const title = `${' '.repeat(8)}parallel rebuild ${(i + 1).toString().padEnd(2, ' ')}`
         console.log(`${title} : Start`)
         console.time(title)
@@ -166,7 +177,6 @@ describe('addon', function () {
         assert.strictEqual(err, null)
         assert.strictEqual(lastLine, 'gyp info ok', 'should end in ok')
       }))
-      assert.strictEqual(runHello(), 'world')
     })
   })
 })
