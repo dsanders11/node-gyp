@@ -74,7 +74,7 @@ describe('install', function () {
       }
 
       return it(name, async function () {
-        this.timeout(platformTimeout(10, { win32: 20 }))
+        this.timeout(platformTimeout(4, { win32: 20 }))
         await fn.call(this)
         const expectedDir = path.join(prog.devDir, process.version.replace(/^v/, ''))
         await rm(expectedDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 1000 })
